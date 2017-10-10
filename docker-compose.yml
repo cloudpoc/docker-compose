@@ -1,0 +1,41 @@
+rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "5672:5672"
+    - "15672:15672"
+
+discovery:
+  image: cloudpoc/discovery-server
+  ports:
+    - "8761:8761"
+
+pro:
+  image: cloudpoc/productservice
+  links:
+    - discovery
+
+pri:
+  image: cloudpoc/pricingservice
+  links:
+    - discovery
+
+composite:
+  image: cloudpoc/browseapi
+  links:
+    - discovery
+    - rabbitmq
+
+monitor:
+  image: cloudpoc/monitor-dashboard
+  ports:
+    - "7979:7979"
+  links:
+    - composite
+
+edge:
+  image: cloudpoc/edge-server
+  ports:
+    - "443:8765"
+  links:
+    - discovery
+    - composite
